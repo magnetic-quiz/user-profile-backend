@@ -9,8 +9,8 @@ app.use("/api/users", userRoutes);
 connect(
   "mongodb+srv://magneticquiz:zvD1mjrOcyyagiwd@magneticcluster.ad5u1.mongodb.net/userbase?retryWrites=true&w=majority&appName=magneticCluster"
 ).then(() => {
-  app.listen(3000, () => {
-    console.log("server running at port 3000");
+  app.listen(5001, () => {
+    console.log("server running at port 5001");
   });
   console.log("Database Connected!");
 });

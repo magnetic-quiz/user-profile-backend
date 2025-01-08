@@ -1,33 +1,33 @@
 import { Schema, model } from "mongoose";
 
 const UserSchema = new Schema({
-  username: {
+  userID: {
     type: String,
     required: true,
     unique: true,
   },
-  contact: {
-    email: String,
-    phone: String,
+  displayName: { type: String },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
   },
   plan: {
     type: {
       type: String,
-      enum: ["Free", "Pro", "Enterprise"],
-      default: "Free",
+      enum: ["Trial", "Pro", "Enterprise"],
+      default: "Trial",
     },
-    expiry: Date,
-    responsesLeft: Number,
-  },
-  onboardingPreferences: {
-    type: Object,
-  },
-  quizzes: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Quiz",
+    expiry: {
+      type: Date,
+      default: null,
     },
-  ],
+    responsesLeft: {
+      type: Number,
+      default: 0,
+    },
+  },
+  quizIDs: [{ type: String }],
 });
 
 export const User = model("User", UserSchema);
