@@ -22,10 +22,6 @@ const UserSchema = new Schema({
   onboardingPreferences: {
     type: Object,
   },
-  globalBranding: {
-    logo: String,
-    primaryColor: String,
-  },
   quizzes: [
     {
       type: Schema.Types.ObjectId,
