@@ -6,7 +6,7 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
-  displayName: { type: String },
+  username: { type: String, unique: false },
   email: {
     type: String,
     required: true,
@@ -18,16 +18,12 @@ const UserSchema = new Schema({
       enum: ["Trial", "Pro", "Enterprise"],
       default: "Trial",
     },
-    expiry: {
-      type: Date,
-      default: null,
-    },
     responsesLeft: {
       type: Number,
       default: 0,
     },
   },
-  quizIDs: [{ type: String }],
+  quizIDs: [{ type: String, default: "" }],
 });
 
 export const User = model("User", UserSchema);
