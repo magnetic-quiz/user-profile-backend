@@ -6,7 +6,7 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
-  username: { type: String, unique: false },
+  displayName: { type: String, unique: false },
   email: {
     type: String,
     required: true,
@@ -20,10 +20,10 @@ const UserSchema = new Schema({
     },
     responsesLeft: {
       type: Number,
-      default: 0,
+      default: 10,
     },
   },
-  quizIDs: [{ type: String, default: "" }],
+  quizIDs: [{ type: String }],
 });
 
 export const User = model("User", UserSchema);
