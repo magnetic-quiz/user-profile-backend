@@ -13,6 +13,7 @@ const allowedOrigins = [
   "https://quizflo.com",
   "https://www.quizflo.com",
   "https://quizflo-git-development-quizflos-projects.vercel.app/",
+  "http://localhost:3001",
 ];
 
 app.use(
