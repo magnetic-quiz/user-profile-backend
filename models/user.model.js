@@ -13,18 +13,6 @@ const UserSchema = new Schema(
       required: true,
       unique: true,
     },
-    plan: {
-      type: {
-        type: String,
-        enum: ["Trial", "Pro", "Enterprise"],
-        default: "Trial",
-        alias: "planType",
-      },
-      responsesLeft: {
-        type: Number,
-        default: 10,
-      },
-    },
     status: {
       type: String,
       enum: [

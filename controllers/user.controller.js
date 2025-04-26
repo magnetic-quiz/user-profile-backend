@@ -88,8 +88,8 @@ export const updateSubscriptionStatus = async (req, res) => {
 
     // 3. Check if this subscriptionID is already assigned (idempotency)
     if (
-      user.plan.paypalSubscriptionID === subscriptionID &&
-      user.plan.status !== "pending_approval"
+      user.paypalSubscriptionID === subscriptionID &&
+      user.status !== "pending_approval"
     ) {
       console.log(
         `Subscription ${subscriptionID} already processed for user ${userID}.`
@@ -98,7 +98,7 @@ export const updateSubscriptionStatus = async (req, res) => {
     }
     // Check if ID assigned to *another* user (security/error case)
     const subAssignedToOther = await User.findOne({
-      "plan.paypalSubscriptionID": subscriptionID,
+      paypalSubscriptionID: subscriptionID,
       userID: { $ne: userID },
     });
     if (subAssignedToOther) {
@@ -128,16 +128,13 @@ export const updateSubscriptionStatus = async (req, res) => {
       );
       // Maybe update status to 'incomplete' or similar in DB?
       // For now, return an error indicating unexpected status
-      return res
-        .status(400)
-        .json({
-          message: `Subscription status is ${paypalSubDetails.status}. Cannot activate plan.`,
-        });
+      return res.status(400).json({
+        message: `Subscription status is ${paypalSubDetails.status}. Cannot activate plan.`,
+      });
     }
 
     // 5. Update user's plan details in your database
-    user.plan.planType = "Pro"; // Or map from paypalSubDetails.plan_id if needed
-    user.plan.paypalSubscriptionID = subscriptionID;
+    user.paypalSubscriptionID = subscriptionID;
 
     // Determine plan status and trial end date
     // Note: PayPal's ACTIVE status covers both trialing and paid periods.
@@ -149,25 +146,22 @@ export const updateSubscriptionStatus = async (req, res) => {
       paypalSubDetails.billing_info.cycle_executions.length > 0 &&
       paypalSubDetails.billing_info.cycle_executions[0].tenure_type === "TRIAL"
     ) {
-      user.plan.status = "trialing";
+      user.status = "trialing";
       // Try to get trial end date from PayPal if available (might need specific API calls or webhook data)
       // For simplicity, calculate based on current date + trial duration (e.g., 14 days)
       // This is an approximation if the exact time isn't available from this API call.
       const trialDays = 14; // Or get from your plan config
-      user.plan.trialEndDate = new Date(
+      user.trialEndDate = new Date(
         Date.now() + trialDays * 24 * 60 * 60 * 1000
       );
       console.log(
-        `User ${userID} plan set to 'trialing'. Trial ends approx: ${user.plan.trialEndDate}`
+        `User ${userID} plan set to 'trialing'. Trial ends approx: ${user.trialEndDate}`
       );
     } else {
-      user.plan.status = "active"; // No trial info found or trial tenure is not first, assume active paid
-      user.plan.trialEndDate = null; // Clear any previous trial date
+      user.status = "active"; // No trial info found or trial tenure is not first, assume active paid
+      user.trialEndDate = null; // Clear any previous trial date
       console.log(`User ${userID} plan set to 'active'.`);
     }
-
-    // Set plan limits based on "Pro" plan
-    user.plan.responsesLeft = 1000; // Example: Set Pro plan limits
 
     await user.save();
     console.log(
@@ -186,11 +180,9 @@ export const updateSubscriptionStatus = async (req, res) => {
       error.message.includes("PayPal Subscription") ||
       error.message.includes("Failed to verify")
     ) {
-      res
-        .status(502)
-        .json({
-          message: `Error verifying subscription with PayPal: ${error.message}`,
-        }); // Bad Gateway for upstream issues
+      res.status(502).json({
+        message: `Error verifying subscription with PayPal: ${error.message}`,
+      }); // Bad Gateway for upstream issues
     } else if (error.message.includes("User with userID")) {
       res.status(404).json({ message: error.message });
     } else {
